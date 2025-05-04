@@ -1,0 +1,183 @@
+
+/* iOS-inspired app styling */
+
+/* Reset some defaults */
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Better tap targets on mobile */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* iOS-like body */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #1c1c1e;
+  background-color: #f5f5f7;
+  margin: 0;
+  padding: 0;
+}
+
+/* iOS-like animations */
+@keyframes slide-in {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+/* Content container */
+.content-container {
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+/* iOS-like badge */
+.ios-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  color: white;
+  background-color: #ff3b30;
+  border-radius: 9px;
+}
+
+/* Page container with bottom padding for fixed nav */
+.page-container {
+  padding-bottom: 4rem;
+  padding-top: 1rem;
+  min-height: 100vh;
+}
+
+/* Card design */
+.minimal-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  margin-bottom: 12px;
+}
+
+.minimal-card-header {
+  height: 2px;
+  background: linear-gradient(to right, #9b87f5, #65a9fe);
+}
+
+/* Button styles */
+.gradient-button {
+  background: linear-gradient(to right, #9b87f5, #65a9fe);
+  color: white;
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-weight: 500;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.gradient-button:hover {
+  background: linear-gradient(to right, #8a76e4, #5498ed);
+}
+
+/* iOS-style bottom sheet */
+.ios-sheet {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  background-color: white;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+/* iOS-style card with gradient header */
+.ios-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 12px;
+}
+
+/* iOS-style shadows */
+.ios-shadow {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Reduced scaling for a more minimalist look */
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-base {
+  font-size: 1rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+/* More subtle transition effects */
+.transition-all {
+  transition-duration: 200ms;
+}
+
+/* Subtle animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.98); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+/* Improved responsiveness */
+@media (max-width: 640px) {
+  body {
+    font-size: 15px;
+  }
+  
+  .minimal-card {
+    border-radius: 10px;
+  }
+  
+  .content-container {
+    padding: 0 0.75rem;
+  }
+}
