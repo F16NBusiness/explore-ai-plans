@@ -1,11 +1,11 @@
 
 import React from 'react';
 
-// Import the fox mascot images using relative paths
-import foxDefault from '/Fox logo.webp';
-import foxSki from '/Fox logo2.webp';
-import foxBeach from '/Fox logo3.webp';
-import foxMap from '/Fox logo4.webp';
+// Import the fox mascot images as static assets
+import foxDefault from '../assets/fox-logo.webp';
+import foxSki from '../assets/fox-logo2.webp';
+import foxBeach from '../assets/fox-logo3.webp';
+import foxMap from '../assets/fox-logo4.webp';
 
 type FoxMascotVariant = 'default' | 'ski' | 'beach' | 'map' | 'family';
 type FoxMascotSize = 'sm' | 'md' | 'lg';
