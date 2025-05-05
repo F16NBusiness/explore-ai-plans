@@ -35,6 +35,10 @@ const FoxMascot: React.FC<FoxMascotProps> = ({
         return foxBeach;
       case 'map':
         return foxMap;
+      case 'family':
+        // For now, we're using foxMap for family variant too
+        // When the family image is available, we can update this
+        return foxMap;
       case 'default':
       default:
         return foxDefault;
