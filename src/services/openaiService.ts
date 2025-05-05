@@ -1,3 +1,4 @@
+
 // This service handles communication with OpenAI API for generating travel content
 import { API_CONFIG } from '@/config/api';
 
@@ -117,93 +118,87 @@ export const generateDestinationContent = async (
       Create an authentic, detailed travel experience with specific places that someone could actually follow in ${city}, ${country}.
     `;
 
+    console.log("Calling OpenAI API with prompt...");
+      
+    // Make the actual API call to OpenAI
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a travel expert providing detailed information about destinations.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("OpenAI API error:", errorData);
+      throw new Error(`OpenAI API responded with status ${response.status}: ${JSON.stringify(errorData)}`);
+    }
+    
+    const data = await response.json();
+    console.log("OpenAI API response received");
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error("Invalid response structure from OpenAI:", data);
+      throw new Error("Invalid response structure from OpenAI");
+    }
+    
+    // Parse the content which should be a JSON string
     try {
-      console.log("Calling OpenAI API with prompt...");
+      const content = data.choices[0].message.content;
+      console.log("Parsing JSON from OpenAI response");
       
-      // Make the actual API call to OpenAI
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4",
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a travel expert providing detailed information about destinations.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 2000
-        })
-      });
+      // Extract JSON from the response (in case it's wrapped in markdown or other text)
+      const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || 
+                        content.match(/```([\s\S]*?)```/) ||
+                        [null, content];
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("OpenAI API error:", errorData);
-        throw new Error(`OpenAI API responded with status ${response.status}: ${JSON.stringify(errorData)}`);
+      const jsonContent = jsonMatch[1] || content;
+      const parsedContent = JSON.parse(jsonContent);
+      
+      console.log("Successfully parsed OpenAI response");
+      
+      // Validate the response has the expected structure
+      if (!parsedContent.activities || !Array.isArray(parsedContent.activities)) {
+        console.error("OpenAI response missing activities array:", parsedContent);
+        throw new Error("OpenAI response missing activities array");
       }
       
-      const data = await response.json();
-      console.log("OpenAI API response received");
+      // Ensure activities have all required fields
+      const validatedActivities = parsedContent.activities.map((activity: any) => ({
+        time: activity.time || "12:00 PM",
+        title: activity.title || `Visit to a place in ${city}`,
+        description: activity.description || `Enjoy your time in ${city}`,
+        budget: activity.budget || "$15-30",
+        location: activity.location || `${city}, ${country}`
+      }));
       
-      if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-        console.error("Invalid response structure from OpenAI:", data);
-        throw new Error("Invalid response structure from OpenAI");
-      }
+      // Return the parsed and validated content
+      return {
+        activities: validatedActivities,
+        packingList: Array.isArray(parsedContent.packingList) ? parsedContent.packingList : [],
+        tips: Array.isArray(parsedContent.tips) ? parsedContent.tips : []
+      };
       
-      // Parse the content which should be a JSON string
-      try {
-        const content = data.choices[0].message.content;
-        console.log("Parsing JSON from OpenAI response");
-        
-        // Extract JSON from the response (in case it's wrapped in markdown or other text)
-        const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || 
-                          content.match(/```([\s\S]*?)```/) ||
-                          [null, content];
-        
-        const jsonContent = jsonMatch[1] || content;
-        const parsedContent = JSON.parse(jsonContent);
-        
-        console.log("Successfully parsed OpenAI response");
-        
-        // Validate the response has the expected structure
-        if (!parsedContent.activities || !Array.isArray(parsedContent.activities)) {
-          console.error("OpenAI response missing activities array:", parsedContent);
-          throw new Error("OpenAI response missing activities array");
-        }
-        
-        // Ensure activities have all required fields
-        const validatedActivities = parsedContent.activities.map((activity: any) => ({
-          time: activity.time || "12:00 PM",
-          title: activity.title || `Visit to a place in ${city}`,
-          description: activity.description || `Enjoy your time in ${city}`,
-          budget: activity.budget || "$15-30",
-          location: activity.location || `${city}, ${country}`
-        }));
-        
-        // Return the parsed and validated content
-        return {
-          activities: validatedActivities,
-          packingList: Array.isArray(parsedContent.packingList) ? parsedContent.packingList : [],
-          tips: Array.isArray(parsedContent.tips) ? parsedContent.tips : []
-        };
-        
-      } catch (parseError) {
-        console.error("Failed to parse OpenAI response:", parseError);
-        console.log("Raw response:", data.choices[0].message.content);
-        throw new Error("Failed to parse OpenAI response");
-      }
-      
-    } catch (apiError) {
-      console.error("Error calling OpenAI API:", apiError);
-      throw new Error("Failed to generate travel content. Please check your API key and try again.");
+    } catch (parseError) {
+      console.error("Failed to parse OpenAI response:", parseError);
+      console.log("Raw response:", data.choices[0].message.content);
+      throw new Error("Failed to parse OpenAI response");
     }
   } catch (error) {
     console.error("Error generating destination content:", error);

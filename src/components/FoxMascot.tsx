@@ -1,6 +1,7 @@
+
 import React from 'react';
 
-// Import the fox mascot images
+// Import the fox mascot images using relative paths
 import foxDefault from '/Fox logo.webp';
 import foxSki from '/Fox logo2.webp';
 import foxBeach from '/Fox logo3.webp';
