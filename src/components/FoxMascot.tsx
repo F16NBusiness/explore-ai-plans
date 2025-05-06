@@ -41,16 +41,16 @@ const FoxMascot: React.FC<FoxMascotProps> = ({
         const imageName = `fox-${variant}.webp`;
         
         // Try to get the image from Supabase
-        const { data, error } = await supabase
+        const { data } = await supabase
           .storage
           .from('fox_mascots')
           .getPublicUrl(imageName);
         
-        if (error) {
-          console.error('Error fetching image from Supabase:', error);
-          setImageUrl(fallbackImages[variant]);
-        } else if (data) {
+        if (data) {
           setImageUrl(data.publicUrl);
+        } else {
+          // If no data returned, use fallback
+          setImageUrl(fallbackImages[variant]);
         }
       } catch (error) {
         console.error('Unexpected error:', error);
