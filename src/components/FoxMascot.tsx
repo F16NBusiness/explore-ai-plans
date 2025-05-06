@@ -18,6 +18,7 @@ const FoxMascot: React.FC<FoxMascotProps> = ({
 }) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const sizeClasses = {
     sm: 'w-12 h-12',
@@ -31,30 +32,43 @@ const FoxMascot: React.FC<FoxMascotProps> = ({
     ski: '/lovable-uploads/4bfccb3b-9f11-488c-8fc8-3ca5ac46e391.png',
     beach: '/lovable-uploads/ee1c8cbc-ef5e-4221-bf99-d19b56b4a0c3.png',
     map: '/lovable-uploads/e5af8af1-41a6-4654-8acf-bf7185f0fa3f.png',
-    family: '/lovable-uploads/e5af8af1-41a6-4654-8acf-bf7185f0fa3f.png' // Temporarily using map for family
+    family: '/lovable-uploads/cf3a3bb9-8ad8-41ca-a6af-9abe9a59fdce.png' // Using the uploaded image
   };
 
   useEffect(() => {
     const fetchImage = async () => {
       setLoading(true);
+      setError(false);
       try {
         const imageName = `fox-${variant}.webp`;
+        console.log(`Fetching image: ${imageName} from fox_mascots bucket`);
         
         // Try to get the image from Supabase
-        const { data } = await supabase
+        const { data, error } = await supabase
           .storage
           .from('fox_mascots')
           .getPublicUrl(imageName);
         
+        if (error) {
+          console.error('Error fetching from Supabase:', error);
+          setError(true);
+          setImageUrl(fallbackImages[variant]);
+          return;
+        }
+        
         if (data && data.publicUrl) {
-          setImageUrl(data.publicUrl);
+          console.log('Successfully fetched image URL:', data.publicUrl);
+          // Add a timestamp to force a fresh image load and avoid caching issues
+          const timestampedUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
+          setImageUrl(timestampedUrl);
         } else {
-          // If no data returned, use fallback
+          console.warn('No data returned from Supabase, using fallback');
           setImageUrl(fallbackImages[variant]);
         }
       } catch (error) {
         console.error('Unexpected error:', error);
         setImageUrl(fallbackImages[variant]);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -74,8 +88,15 @@ const FoxMascot: React.FC<FoxMascotProps> = ({
           src={imageUrl || fallbackImages[variant]} 
           alt={`Fox mascot ${variant}`} 
           className="w-full h-full object-contain transition-transform group-hover:scale-105 duration-300"
-          onError={() => setImageUrl(fallbackImages[variant])}
+          onError={() => {
+            console.log(`Error loading image, falling back to: ${fallbackImages[variant]}`);
+            setImageUrl(fallbackImages[variant]);
+          }}
         />
+      )}
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-10 rounded-full">
+        </div>
       )}
     </div>
   );

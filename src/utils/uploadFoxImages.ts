@@ -9,14 +9,16 @@ interface FoxImage {
 export const uploadFoxImage = async (variant: string, file: File): Promise<string | null> => {
   try {
     const fileName = `fox-${variant}.webp`;
+    console.log(`Uploading ${fileName} to fox_mascots bucket`);
     
     // Upload the file to Supabase storage
     const { data, error } = await supabase
       .storage
       .from('fox_mascots')
       .upload(fileName, file, {
-        cacheControl: '3600',
-        upsert: true
+        cacheControl: '0', // Don't cache since we want fresh images
+        upsert: true,
+        contentType: file.type // Set the correct content type
       });
     
     if (error) {
@@ -30,6 +32,7 @@ export const uploadFoxImage = async (variant: string, file: File): Promise<strin
       .from('fox_mascots')
       .getPublicUrl(fileName);
     
+    console.log(`Successfully uploaded image. Public URL: ${urlData.publicUrl}`);
     return urlData.publicUrl;
   } catch (error) {
     console.error('Unexpected error during upload:', error);
@@ -45,6 +48,7 @@ export const uploadAllFoxImages = async (
   familyImage?: File
 ): Promise<boolean> => {
   try {
+    console.log('Starting upload of all fox mascot images');
     const images: FoxImage[] = [
       { variant: 'default', file: defaultImage },
       { variant: 'ski', file: skiImage },
@@ -57,9 +61,11 @@ export const uploadAllFoxImages = async (
     }
     
     const uploadPromises = images.map(img => uploadFoxImage(img.variant, img.file));
-    await Promise.all(uploadPromises);
+    const results = await Promise.all(uploadPromises);
     
-    return true;
+    const allSucceeded = results.every(result => result !== null);
+    console.log(`Upload completed. All succeeded: ${allSucceeded}`);
+    return allSucceeded;
   } catch (error) {
     console.error('Failed to upload all fox images:', error);
     return false;
