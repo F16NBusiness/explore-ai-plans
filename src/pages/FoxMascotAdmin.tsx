@@ -1,10 +1,9 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import FoxMascot from '@/components/FoxMascot';
 import { uploadAllFoxImages } from '@/utils/uploadFoxImages';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,7 +18,7 @@ const FoxMascotAdmin: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [session, setSession] = useState<any>(null);
   
-  React.useEffect(() => {
+  useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
@@ -50,11 +49,7 @@ const FoxMascotAdmin: React.FC = () => {
 
   const handleUpload = async () => {
     if (!defaultImage || !skiImage || !beachImage || !mapImage) {
-      toast({
-        title: "Missing Files",
-        description: "Please select all required fox mascot images before uploading.",
-        variant: "destructive"
-      });
+      toast.error("Please select all required fox mascot images before uploading.");
       return;
     }
 
@@ -69,11 +64,7 @@ const FoxMascotAdmin: React.FC = () => {
       );
 
       if (success) {
-        toast({
-          title: "Upload Complete",
-          description: "All fox mascot images have been uploaded successfully.",
-          variant: "default"
-        });
+        toast.success("All fox mascot images have been uploaded successfully.");
         
         // Refresh the page to see the new images
         window.location.reload();
@@ -82,11 +73,7 @@ const FoxMascotAdmin: React.FC = () => {
       }
     } catch (error) {
       console.error('Error during upload:', error);
-      toast({
-        title: "Upload Failed",
-        description: "There was a problem uploading the fox mascot images. Please try again.",
-        variant: "destructive"
-      });
+      toast.error("There was a problem uploading the fox mascot images. Please try again.");
     } finally {
       setUploading(false);
     }

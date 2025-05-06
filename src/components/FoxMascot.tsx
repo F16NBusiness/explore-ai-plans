@@ -46,7 +46,7 @@ const FoxMascot: React.FC<FoxMascotProps> = ({
           .from('fox_mascots')
           .getPublicUrl(imageName);
         
-        if (data) {
+        if (data && data.publicUrl) {
           setImageUrl(data.publicUrl);
         } else {
           // If no data returned, use fallback
