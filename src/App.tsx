@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
@@ -11,6 +10,8 @@ import ProfilePage from './pages/ProfilePage';
 import BottomNavigation from './components/BottomNavigation';
 import { Toaster } from 'sonner';
 import FoxMessage from './components/FoxMessage';
+import FoxMascotAdmin from './pages/FoxMascotAdmin';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/itinerary" element={<ItineraryPage />} />
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/admin/fox-mascots" element={<FoxMascotAdmin />} />
           <Route path="*" element={
             <div className="h-screen flex flex-col items-center justify-center p-6">
               <FoxMessage 
